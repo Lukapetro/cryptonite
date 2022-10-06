@@ -1,18 +1,14 @@
-import { Popover, Transition } from "@headlessui/react";
-import { ChevronRightIcon } from "@heroicons/react/20/solid";
+import { Popover } from "@headlessui/react";
 import {
   ArrowPathIcon,
-  Bars3Icon,
   CloudArrowUpIcon,
   CogIcon,
   LockClosedIcon,
   ServerIcon,
   ShieldCheckIcon,
-  XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Fragment } from "react";
-import Footer from "./Footer";
 import Logo from "~/images/logos/cryptonite-black.svg";
+import Footer from "./Footer";
 
 // const navigation = [
 //   { name: "Product", href: "#" },
@@ -216,7 +212,7 @@ export default function Home() {
                   Serverless
                 </h2>
                 <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                  No server? No problem.
+                  Analisi tecnica? No problem.
                 </p>
                 <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
                   Phasellus lorem quam molestie id quisque diam aenean nulla in.
@@ -241,7 +237,7 @@ export default function Home() {
                 Deploy faster
               </h2>
               <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                Everything you need to deploy your app
+                Tutti gli indicatori necessari
               </p>
               <p className="mx-auto mt-5 max-w-prose text-xl text-gray-500">
                 Phasellus lorem quam molestie id quisque diam aenean nulla in.
