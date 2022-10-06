@@ -18,7 +18,7 @@ export const links: LinksFunction = () => {
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
-  title: "Remix Notes",
+  title: "Cryptonite",
   viewport: "width=device-width,initial-scale=1",
 });
 
@@ -37,7 +37,7 @@ export default function App() {
       </head>
       <body className="h-full">
         <Outlet />
-        <ScrollRestoration />
+        {/* <ScrollRestoration /> */}
         <Scripts />
         <LiveReload />
       </body>
