@@ -7,7 +7,13 @@ import {
   ServerIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
+import type { ActionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Form, useActionData } from "@remix-run/react";
 import Logo from "~/images/logos/cryptonite-black.svg";
+import { createUser } from "~/models/user.server";
+import { createUserSession } from "~/session.server";
+import { safeRedirect, validateEmail } from "~/utils";
 import Footer from "./Footer";
 
 // const navigation = [
@@ -114,7 +120,32 @@ const blogPosts = [
   },
 ];
 
+export async function action({ request }: ActionArgs) {
+  const formData = await request.formData();
+  console.log("formData", formData);
+  const email = formData.get("email");
+  const redirectTo = safeRedirect(formData.get("redirectTo"), "/wallets");
+
+  if (!validateEmail(email)) {
+    return json({ errors: { email: "Email non valida" } }, { status: 400 });
+  }
+
+  const user = await createUser(email);
+
+  if (!user) {
+    return json({ errors: { email: "Email non valida" } }, { status: 400 });
+  }
+
+  return createUserSession({
+    request,
+    userId: user.id,
+    redirectTo,
+  });
+}
+
 export default function Home() {
+  const actionData = useActionData<typeof action>();
+
   return (
     <div className="bg-white">
       <div className="relative overflow-hidden">
@@ -126,7 +157,7 @@ export default function Home() {
             >
               <div className="flex flex-1 items-center">
                 <div className="flex w-full items-center justify-between md:w-auto">
-                  <a href="#">
+                  <a href="/">
                     <span className="sr-only">Cryptonite</span>
                     <img className="h-12 w-auto sm:h-20" src={Logo} alt="" />
                   </a>
@@ -156,32 +187,41 @@ export default function Home() {
                         action="#"
                         className="sm:mx-auto sm:max-w-xl lg:mx-0"
                       >
-                        <div className="sm:flex">
-                          <div className="min-w-0 flex-1">
-                            <label htmlFor="email" className="sr-only">
-                              Email
-                            </label>
-                            <input
-                              id="email"
-                              type="email"
-                              placeholder="mario.rossi@gmail.com"
-                              className="block w-full rounded-md border-0 px-4 py-3 text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
-                            />
+                        <Form method="post">
+                          <div className="sm:flex">
+                            <div className="min-w-0 flex-1">
+                              <label htmlFor="email" className="sr-only">
+                                Email
+                              </label>
+                              <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                required
+                                autoComplete="email"
+                                placeholder="mario.rossi@gmail.com"
+                                aria-invalid={
+                                  actionData?.errors?.email ? true : undefined
+                                }
+                                aria-describedby="email-error"
+                                className="block w-full rounded-md border-0 px-4 py-3 text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+                              />
+                            </div>
+                            <div className="mt-3 sm:mt-0 sm:ml-3">
+                              <button
+                                type="submit"
+                                className="block w-full rounded-md bg-gradient-to-r from-teal-500 to-teal-500 py-3 px-4 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+                              >
+                                Analizza gratis
+                              </button>
+                            </div>
                           </div>
-                          <div className="mt-3 sm:mt-0 sm:ml-3">
-                            <button
-                              type="submit"
-                              className="block w-full rounded-md bg-gradient-to-r from-teal-500 to-teal-500 py-3 px-4 font-medium text-white shadow hover:from-teal-600 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-gray-900"
-                            >
-                              Analizza gratis
-                            </button>
-                          </div>
-                        </div>
+                        </Form>
                         <p className="mt-3 text-sm text-gray-300 sm:mt-4">
                           L'analisi è completamente gratuita, nessuna carta
                           necessaria. Fornendo il tuo indirizzo e-mail, accetti
                           le nostre{" "}
-                          <a href="#" className="font-medium text-white">
+                          <a href="/" className="font-medium text-white">
                             condizioni di servizio
                           </a>
                           .

@@ -3,9 +3,9 @@ import { Link } from "@remix-run/react";
 export default function NoteIndexPage() {
   return (
     <p>
-      No note selected. Select a note on the left, or{" "}
+      Nessun wallet selezionato. Seleziona un wallet a sinistra,{" "}
       <Link to="new" className="text-blue-500 underline">
-        create a new note.
+        oppure creane uno nuovo.
       </Link>
     </p>
   );

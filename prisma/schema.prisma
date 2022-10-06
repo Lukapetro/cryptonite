@@ -14,34 +14,39 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  password Password?
-  notes    Note[]
+  wallets  Wallet[]
 }
 
-model Password {
-  hash String
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String @unique
-}
-
-model Note {
+model Wallet {
   id    String @id @default(cuid())
   title String
-  body  String
+  description  String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
+
+  assets AssetsOnWallets[]
 }
 
-model Post {
-  slug     String @id
-  title    String
-  markdown String
+model Asset {
+  id    String @id @default(cuid())
+  name  String
+  percentage Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  wallets AssetsOnWallets[]
+}
+
+model AssetsOnWallets {
+  wallet     Wallet @relation(fields: [walletId], references: [id])
+  walletId   String 
+  asset      Asset @relation(fields: [assetId], references: [id])
+  assetId    String 
+
+  @@id([walletId, assetId])
 }
