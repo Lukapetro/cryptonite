@@ -16,12 +16,6 @@ import { createUserSession } from "~/session.server";
 import { safeRedirect, validateEmail } from "~/utils";
 import Footer from "./Footer";
 
-// const navigation = [
-//   { name: "Product", href: "#" },
-//   { name: "Features", href: "#" },
-//   { name: "Marketplace", href: "#" },
-//   { name: "Company", href: "#" },
-// ];
 const features = [
   {
     name: "Push to Deploy",
@@ -122,7 +116,6 @@ const blogPosts = [
 
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
-  console.log("formData", formData);
   const email = formData.get("email");
   const redirectTo = safeRedirect(formData.get("redirectTo"), "/wallets");
 

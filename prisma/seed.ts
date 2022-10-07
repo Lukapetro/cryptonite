@@ -1,12 +1,13 @@
 import { PrismaClient } from "@prisma/client";
+import Assets from "./assetlist.json";
 
 const prisma = new PrismaClient();
 
 async function seed() {
-  const email = "test@test.it";
+  const email = "test1@test.it";
 
   // cleanup the existing database
-  await prisma.user.delete({ where: { email } }).catch(() => {
+  await prisma.user.deleteMany().catch(() => {
     // no worries if it doesn't exist yet
   });
 
@@ -16,7 +17,13 @@ async function seed() {
     },
   });
 
-  const bitcoinAsset = await prisma.asset.create({ data: { name: "bitcoin" } });
+  for (const asset of Assets) {
+    await prisma.asset.upsert({
+      where: { id: asset.id },
+      update: asset,
+      create: asset,
+    });
+  }
 
   await prisma.wallet.create({
     data: {
@@ -27,10 +34,19 @@ async function seed() {
         create: [
           {
             asset: {
-              create: {
-                name: "ethereum",
+              connect: {
+                id: "bitcoin",
               },
             },
+            percentage: 90,
+          },
+          {
+            asset: {
+              connect: {
+                id: "ethereum",
+              },
+            },
+            percentage: 10,
           },
         ],
       },

@@ -122,7 +122,6 @@ const blogPosts = [
 
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
-  console.log("formData", formData);
   const email = formData.get("email");
   const redirectTo = safeRedirect(formData.get("redirectTo"), "/wallets");
 
@@ -139,7 +138,7 @@ export async function action({ request }: ActionArgs) {
   return createUserSession({
     request,
     userId: user.id,
-    redirectTo: "/wallets",
+    redirectTo,
   });
 }
 

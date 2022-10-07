@@ -7,9 +7,9 @@ const navigation = [
 
 export default function Header() {
   return (
-    <header className="bg-indigo-600">
+    <header className="bg-teal-600">
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Top">
-        <div className="flex w-full items-center justify-between border-b border-indigo-500 py-6 lg:border-none">
+        <div className="flex w-full items-center justify-between border-b border-teal-500 py-6 lg:border-none">
           <div className="flex items-center">
             <a href="#">
               <span className="sr-only">Cryptonite</span>
@@ -24,7 +24,7 @@ export default function Header() {
                 <a
                   key={link.name}
                   href={link.href}
-                  className="text-base font-medium text-white hover:text-indigo-50"
+                  className="text-base font-medium text-white hover:text-teal-50"
                 >
                   {link.name}
                 </a>
@@ -34,13 +34,13 @@ export default function Header() {
           <div className="ml-10 space-x-4">
             <a
               href="#"
-              className="inline-block rounded-md border border-transparent bg-indigo-500 py-2 px-4 text-base font-medium text-white hover:bg-opacity-75"
+              className="inline-block rounded-md border border-transparent bg-teal-500 py-2 px-4 text-base font-medium text-white hover:bg-opacity-75"
             >
               Sign in
             </a>
             <a
               href="#"
-              className="inline-block rounded-md border border-transparent bg-white py-2 px-4 text-base font-medium text-indigo-600 hover:bg-indigo-50"
+              className="inline-block rounded-md border border-transparent bg-white py-2 px-4 text-base font-medium text-teal-600 hover:bg-teal-50"
             >
               Sign up
             </a>
@@ -51,7 +51,7 @@ export default function Header() {
             <a
               key={link.name}
               href={link.href}
-              className="text-base font-medium text-white hover:text-indigo-50"
+              className="text-base font-medium text-white hover:text-teal-50"
             >
               {link.name}
             </a>

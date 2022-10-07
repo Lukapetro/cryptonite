@@ -1,4 +1,4 @@
-import type { Asset, User, Wallet } from "@prisma/client";
+import type { User, Wallet } from "@prisma/client";
 
 import { prisma } from "~/db.server";
 
@@ -11,16 +11,13 @@ export function getWallet({
   userId: User["id"];
 }) {
   return prisma.wallet.findFirst({
-    select: { id: true, title: true, status: true, assets: true },
+    select: { id: true, title: true, status: true },
     where: { id, userId },
   });
 }
 
-export function getWalletListItems({ userId }: { userId: User["id"] }) {
-  return prisma.wallet.findMany({
-    where: { userId },
-    orderBy: { updatedAt: "desc" },
-  });
+export function getAllAsset() {
+  return prisma.asset.findMany();
 }
 
 export function createWallet({
@@ -35,18 +32,6 @@ export function createWallet({
       title,
       description,
       status: "empty",
-      assets: {
-        create: [
-          {
-            asset: {
-              connect: {
-                id: "bitcoin",
-              },
-            },
-            percentage: 100,
-          },
-        ],
-      },
       user: {
         connect: {
           id: userId,

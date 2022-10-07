@@ -17,10 +17,16 @@ model User {
   wallets  Wallet[]
 }
 
+// enum WalletStatus {
+//   Completed
+//   Partial
+//   Empty
+// }
 model Wallet {
   id    String @id @default(cuid())
   title String
   description  String?
+  status  String    @default("Empty")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -32,13 +38,11 @@ model Wallet {
 }
 
 model Asset {
-  id    String @id @default(cuid())
-  name  String
-  percentage Int?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id      String @id
+  symbol  String
+  name    String
+  image   String
+  
   wallets AssetsOnWallets[]
 }
 
@@ -47,6 +51,8 @@ model AssetsOnWallets {
   walletId   String 
   asset      Asset @relation(fields: [assetId], references: [id])
   assetId    String 
+
+  percentage Int?
 
   @@id([walletId, assetId])
 }
