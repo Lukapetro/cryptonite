@@ -1,11 +1,12 @@
+import { PlusIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import * as React from "react";
 import DropdownSelector from "~/components/dropdownselector";
 import { getAllAsset } from "~/models/asset.server";
-
 import { createWallet } from "~/models/wallet.server";
+
 import { requireUserId } from "~/session.server";
 
 export async function loader({ request }: LoaderArgs) {
@@ -15,14 +16,35 @@ export async function loader({ request }: LoaderArgs) {
 
 export async function action({ request }: ActionArgs) {
   const userId = await requireUserId(request);
+  const url = new URL(request.url);
+
+  const searchParams = url.searchParams.getAll("");
+
+  console.log("searchParams", searchParams);
 
   const formData = await request.formData();
+  console.log("formData", formData);
   const title = formData.get("title");
   const description = formData.get("description");
   const asset = formData.get("asset");
-  const allocation = formData.get("allocation");
+  const allocation = formData.get("allocation_0");
 
-  console.log("allocation", allocation);
+  const assets = [
+    {
+      id: "bitcoin",
+      symbol: "btc",
+      name: "Bitcoin",
+      image:
+        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",
+    },
+    {
+      id: "ethereum",
+      symbol: "eth",
+      name: "Ethereum",
+      image:
+        "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880",
+    },
+  ];
 
   if (typeof title !== "string" || title.length === 0) {
     return json(
@@ -38,7 +60,7 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  await createWallet({ title, description, userId });
+  await createWallet({ title, description, userId, assets, percentage: 100 });
 
   return redirect(`/wallets`);
 }
@@ -46,6 +68,7 @@ export async function action({ request }: ActionArgs) {
 export default function NewWalletPage() {
   const actionData = useActionData<typeof action>();
   const data = useLoaderData<typeof loader>();
+  const [assets, setAssets] = React.useState(1);
 
   return (
     <Form method="post" className="space-y-8 divide-y divide-gray-200">
@@ -111,41 +134,79 @@ export default function NewWalletPage() {
               Composizione
             </h3>
             <p className="mt-1 max-w-2xl text-sm text-gray-500">
-              Seleziona gli asset e la loro allocazione all'interno di questo
-              wallet.
+              Seleziona <span className="font-semibold"> fino a 10 asset </span>{" "}
+              e la loro allocazione all'interno di questo wallet.
             </p>
           </div>
 
-          <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-            <div className="sm:col-span-4">
-              <DropdownSelector assets={data.assetLits} />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label
-                htmlFor="last-name"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Allocazione
-              </label>
-              <div className="mt-1">
-                <div className="mt-1 sm:col-span-2 sm:mt-0">
-                  <div className="flex max-w-lg rounded-md shadow-sm">
-                    <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500 sm:text-sm">
-                      %
-                    </span>
-                    <input
-                      type="number"
-                      name="allocation"
-                      id="allocation"
-                      className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
+          {Array.from({ length: assets }, (_, index) => {
+            return (
+              <React.Fragment key={index}>
+                <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                  <div className="sm:col-span-3">
+                    <DropdownSelector
+                      assets={data.assetLits}
+                      assetIndex={index}
                     />
                   </div>
+
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="last-name"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Allocazione
+                    </label>
+                    <div className="mt-1">
+                      <div className="mt-1 sm:col-span-2 sm:mt-0">
+                        <div className="flex max-w-lg rounded-md shadow-sm">
+                          <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500 sm:text-sm">
+                            %
+                          </span>
+                          <input
+                            type="number"
+                            name={`allocation_${index}`}
+                            id={`allocation_${index}`}
+                            className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {index === 0 ? null : (
+                    <div className="sm:col-span-1 ">
+                      <div className="mt-6">
+                        <div className="mt-1 sm:col-span-2 sm:mt-0">
+                          <button
+                            onClick={() => setAssets(assets - 1)}
+                            type="button"
+                            className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-red-500 hover:bg-gray-50 focus:z-10 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                          >
+                            <span className="sr-only">Delete</span>
+                            <XCircleIcon
+                              className="h-5 w-5"
+                              aria-hidden="true"
+                            />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </div>
-          </div>
+              </React.Fragment>
+            );
+          })}
         </div>
+        {assets < 10 ? (
+          <button
+            type="button"
+            onClick={() => setAssets(assets + 1)}
+            className="inline-flex items-center rounded-full border border-transparent bg-teal-600 p-1 text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+          >
+            <PlusIcon className="h-5 w-5" aria-hidden="true" />
+          </button>
+        ) : null}
       </div>
 
       <div className="pt-5">

@@ -4,9 +4,15 @@ import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
 import type { Asset } from "@prisma/client";
 
-export default function DropdownSelector({ assets }: { assets: Asset[] }) {
+export default function DropdownSelector({
+  assets,
+  assetIndex,
+}: {
+  assets: Asset[];
+  assetIndex: number;
+}) {
   const [query, setQuery] = useState("");
-  const [selectedasset, setSelectedasset] = useState(assets[0]);
+  const [selectedasset, setSelectedasset] = useState(assets[assetIndex]);
 
   const filteredAssets =
     query === ""
@@ -18,7 +24,7 @@ export default function DropdownSelector({ assets }: { assets: Asset[] }) {
   return (
     <Combobox as="div" value={selectedasset} onChange={setSelectedasset}>
       <Combobox.Label className="block text-sm font-medium text-gray-700">
-        Asset
+        Asset #{assetIndex + 1}
       </Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input
