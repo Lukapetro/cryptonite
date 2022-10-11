@@ -5,7 +5,7 @@ import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import * as React from "react";
 import DropdownSelector from "~/components/dropdownselector";
 import { getAllAsset } from "~/models/asset.server";
-import { createWallet } from "~/models/wallet.server";
+import { createWallet, IAssetWithAllocation } from "~/models/wallet.server";
 
 import { requireUserId } from "~/session.server";
 
@@ -16,35 +16,24 @@ export async function loader({ request }: LoaderArgs) {
 
 export async function action({ request }: ActionArgs) {
   const userId = await requireUserId(request);
-  const url = new URL(request.url);
-
-  const searchParams = url.searchParams.getAll("");
-
-  console.log("searchParams", searchParams);
 
   const formData = await request.formData();
-  console.log("formData", formData);
-  const title = formData.get("title");
-  const description = formData.get("description");
-  const asset = formData.get("asset");
-  const allocation = formData.get("allocation_0");
 
-  const assets = [
-    {
-      id: "bitcoin",
-      symbol: "btc",
-      name: "Bitcoin",
-      image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",
-    },
-    {
-      id: "ethereum",
-      symbol: "eth",
-      name: "Ethereum",
-      image:
-        "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880",
-    },
-  ];
+  const values = Object.fromEntries(formData);
+
+  const { title, description, ...assetsWithAllocation } = values;
+
+  const assets: IAssetWithAllocation[] = [];
+
+  Object.entries(assetsWithAllocation).forEach(([key, value]) => {
+    if (key.startsWith("asset")) {
+      const index = key.substring(key.indexOf("_") + 1);
+      assets.push({
+        assetId: value as string,
+        percentage: Number(values[`allocation_${index}`]),
+      });
+    }
+  });
 
   if (typeof title !== "string" || title.length === 0) {
     return json(
@@ -55,12 +44,14 @@ export async function action({ request }: ActionArgs) {
 
   if (typeof description !== "string" || description.length === 0) {
     return json(
-      { errors: { title: null, description: "Body is required" } },
+      { errors: { title: null, description: "Description is required" } },
       { status: 400 }
     );
   }
 
-  await createWallet({ title, description, userId, assets, percentage: 100 });
+  //return null;
+
+  await createWallet({ title, description, userId, assets });
 
   return redirect(`/wallets`);
 }
@@ -147,6 +138,8 @@ export default function NewWalletPage() {
                     <DropdownSelector
                       assets={data.assetLits}
                       assetIndex={index}
+                      //id={`asset_${index}`}
+                      name={`asset_${index}`}
                     />
                   </div>
 
@@ -175,21 +168,16 @@ export default function NewWalletPage() {
                   </div>
 
                   {index === 0 ? null : (
-                    <div className="sm:col-span-1 ">
-                      <div className="mt-6">
-                        <div className="mt-1 sm:col-span-2 sm:mt-0">
-                          <button
-                            onClick={() => setAssets(assets - 1)}
-                            type="button"
-                            className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-red-500 hover:bg-gray-50 focus:z-10 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-                          >
-                            <span className="sr-only">Delete</span>
-                            <XCircleIcon
-                              className="h-5 w-5"
-                              aria-hidden="true"
-                            />
-                          </button>
-                        </div>
+                    <div className="mt-6">
+                      <div className="mt-1 sm:col-span-2 sm:mt-0">
+                        <button
+                          onClick={() => setAssets(assets - 1)}
+                          type="button"
+                          className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-red-500 hover:bg-gray-50 focus:z-10 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                        >
+                          <span className="sr-only">Delete</span>
+                          <XCircleIcon className="h-5 w-5" aria-hidden="true" />
+                        </button>
                       </div>
                     </div>
                   )}

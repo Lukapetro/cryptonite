@@ -7,9 +7,11 @@ import type { Asset } from "@prisma/client";
 export default function DropdownSelector({
   assets,
   assetIndex,
+  name,
 }: {
   assets: Asset[];
   assetIndex: number;
+  name: string;
 }) {
   const [query, setQuery] = useState("");
   const [selectedasset, setSelectedasset] = useState(assets[assetIndex]);
@@ -22,7 +24,7 @@ export default function DropdownSelector({
         });
 
   return (
-    <Combobox as="div" value={selectedasset} onChange={setSelectedasset}>
+    <Combobox value={selectedasset} onChange={setSelectedasset}>
       <Combobox.Label className="block text-sm font-medium text-gray-700">
         Asset #{assetIndex + 1}
       </Combobox.Label>
@@ -32,6 +34,7 @@ export default function DropdownSelector({
           onChange={(event) => setQuery(event.target.value)}
           displayValue={() => selectedasset.name}
         />
+        <input type="hidden" name={name} value={selectedasset.id} />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
           <ChevronUpDownIcon
             className="h-5 w-5 text-gray-400"

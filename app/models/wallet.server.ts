@@ -4,6 +4,11 @@ import { prisma } from "~/db.server";
 
 export type { Wallet } from "@prisma/client";
 
+export interface IAssetWithAllocation {
+  assetId: string;
+  percentage: number;
+}
+
 export default function calculateStatus({
   percentage,
 }: {
@@ -65,20 +70,21 @@ export function createWallet({
   title,
   userId,
   assets,
-  percentage,
 }: Pick<Wallet, "description" | "title"> & {
   userId: User["id"];
-} & { assets: Asset[] } & { percentage: AssetsOnWallets["percentage"] }) {
+} & { assets: IAssetWithAllocation[] }) {
   return prisma.wallet.create({
     data: {
       title,
       description,
-      status: calculateStatus({ percentage }),
+      status: "completo",
+
       assets: {
-        create: assets.map((asset1) => ({
+        create: assets.map((asset) => ({
+          percentage: asset.percentage,
           asset: {
             connect: {
-              id: assets.find((asset) => asset.id === asset1.id)?.id,
+              id: asset.assetId,
             },
           },
         })),
