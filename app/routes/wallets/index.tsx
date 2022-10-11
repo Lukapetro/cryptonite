@@ -57,9 +57,7 @@ export default function WalletIndexPage() {
                             <p className="text-sm text-gray-900">
                               Creato il{" "}
                               <time dateTime={wallet.createdAt}>
-                                {DateTime.now(
-                                  wallet.createdAt
-                                ).toLocaleString()}
+                                {wallet.createdAt}
                               </time>
                             </p>
                             <p className="mt-2 flex items-center text-sm text-gray-500">
