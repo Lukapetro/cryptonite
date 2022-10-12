@@ -10,8 +10,7 @@ import { Link, useLoaderData } from "@remix-run/react";
 import NoWalletFound from "~/components/wallets/nowalletfound";
 import { getWalletListItems } from "~/models/wallet.server";
 import { requireUserId } from "~/session.server";
-import { useUser } from "~/utils";
-import { DateTime } from "luxon";
+import dayjs from "dayjs";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await requireUserId(request);
@@ -52,14 +51,16 @@ export default function WalletIndexPage() {
                             </span>
                           </p>
                         </div>
+
                         <div className="hidden md:block">
                           <div>
                             <p className="text-sm text-gray-900">
                               Creato il{" "}
                               <time dateTime={wallet.createdAt}>
-                                {wallet.createdAt}
+                                {dayjs(wallet.createdAt).format("DD/MM/YYYY")}
                               </time>
                             </p>
+
                             <p className="mt-2 flex items-center text-sm text-gray-500">
                               <CheckCircleIcon
                                 className="mr-1.5 h-5 w-5 flex-shrink-0 text-red-400"
