@@ -1,4 +1,4 @@
-import type { Asset, AssetsOnWallets, User, Wallet } from "@prisma/client";
+import type { AssetsOnWallets, User, Wallet } from "@prisma/client";
 
 import { prisma } from "~/db.server";
 
