@@ -4,7 +4,7 @@ import Assets from "./assetlist.json";
 const prisma = new PrismaClient();
 
 async function seed() {
-  const email = "test1@test.it";
+  const email = "test@test.it";
 
   // cleanup the existing database
   await prisma.user.deleteMany().catch(() => {
