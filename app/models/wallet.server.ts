@@ -51,7 +51,13 @@ export function getWallet({
       id: true,
       title: true,
       status: true,
-      assets: true,
+      assets: {
+        select: {
+          asset: true,
+          assetId: true,
+          percentage: true,
+        },
+      },
       description: true,
     },
     where: { id, userId },

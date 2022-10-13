@@ -3,7 +3,7 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useCatch, useLoaderData } from "@remix-run/react";
-import { Fragment, useCallback, useMemo, useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import invariant from "tiny-invariant";
 import { getAllAsset } from "~/models/asset.server";
 import { deleteWallet, getWallet } from "~/models/wallet.server";
@@ -14,13 +14,12 @@ export async function loader({ request, params }: LoaderArgs) {
   invariant(params.walletId, "walletId not found");
 
   const wallet = await getWallet({ userId, id: params.walletId });
-  const assets = await getAllAsset();
 
   if (!wallet) {
     throw new Response("Not Found", { status: 404 });
   }
 
-  return json({ wallet, assets });
+  return json({ wallet });
 }
 
 export async function action({ request, params }: ActionArgs) {
@@ -37,22 +36,7 @@ export default function WalletDetailsPage() {
   const data = useLoaderData<typeof loader>();
   const cancelButtonRef = useRef(null);
 
-  const assetList = useMemo(
-    () =>
-      data.assets.filter(({ id: id1 }) =>
-        data.wallet.assets.some(({ assetId: id2 }) => id2 === id1)
-      ),
-    [data]
-  );
-
-  const getAssetImage = useCallback(
-    (id: string) => {
-      const matchingAsset = assetList.find((asset) => asset.id === id);
-      if (!matchingAsset) return;
-      return matchingAsset.image;
-    },
-    [assetList]
-  );
+  console.log("data", data);
 
   return (
     <>
@@ -105,13 +89,13 @@ export default function WalletDetailsPage() {
                           <div className="h-10 w-10 flex-shrink-0">
                             <img
                               className="h-10 w-10 rounded-full"
-                              src={getAssetImage(asset.assetId)}
+                              src={asset.asset.image}
                               alt=""
                             />
                           </div>
                           <div className="ml-4">
                             <div className="font-medium text-gray-900">
-                              {asset.assetId}
+                              {asset.asset.name}
                             </div>
                           </div>
                         </div>
