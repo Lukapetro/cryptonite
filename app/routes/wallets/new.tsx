@@ -24,6 +24,7 @@ export async function action({ request }: ActionArgs) {
   const values = Object.fromEntries(formData);
 
   const { title, description, ...assetsWithAllocation } = values;
+  console.log("assetsWithAllocation", assetsWithAllocation);
 
   const assets: IAssetWithAllocation[] = [];
 
@@ -61,37 +62,49 @@ export async function action({ request }: ActionArgs) {
 export default function NewWalletPage() {
   const actionData = useActionData<typeof action>();
   const data = useLoaderData<typeof loader>();
-  const [assets, setAssets] = React.useState(1);
   const [totalAllocation, setTotalAllocation] = React.useState(0);
+  const [allocations, setAllocations] = React.useState([
+    { id: "allocation_0", value: 0 },
+  ]);
 
-  const [values, setValues] = React.useState({
-    allocation_0: 0,
-    allocation_1: 0,
-    allocation_2: 0,
-    allocation_3: 0,
-  });
+  React.useEffect(() => {
+    const sum = allocations.reduce((accumulator, allocations) => {
+      return accumulator + allocations.value;
+    }, 0);
+    setTotalAllocation(sum);
+  }, [allocations]);
 
-  const valuesHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const addAllocation = (id: string) => {
+    setAllocations((current) => [...current, { id, value: 0 }]);
+  };
+
+  const updateAllocation = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name } = e.target;
     const { value } = e.target;
 
+    console.log("name", name);
+
     const parsedValue = value === "" ? 0 : Number(value);
 
-    const newValues = {
-      ...values,
-      [name]: parsedValue,
-    };
-    setValues(newValues);
-    calcTotal(newValues);
+    setAllocations((current) =>
+      current.map((allocation) => {
+        if (allocation.id === name) {
+          return { ...allocation, id: name, value: parsedValue };
+        }
+        return allocation;
+      })
+    );
   };
 
-  const calcTotal = (newValues: any) => {
-    const { allocation_0, allocation_1 } = newValues;
-    const newTotal = parseInt(allocation_0) + parseInt(allocation_1);
-    setTotalAllocation(newTotal);
+  const removeAllocation = (id: string) => {
+    setAllocations((current) =>
+      current.filter((allocation) => {
+        return allocation.id !== id;
+      })
+    );
   };
 
-  console.log("totalAllocation", totalAllocation);
+  console.log("allocations", allocations);
 
   return (
     <Form method="post" className="space-y-8 divide-y divide-gray-200">
@@ -174,86 +187,74 @@ export default function NewWalletPage() {
 
           {totalAllocation > 100 ? <Alert /> : null}
 
-          {Array.from({ length: assets }, (_, index) => {
-            return (
-              <React.Fragment key={index}>
-                <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                  <div className="sm:col-span-3">
-                    <DropdownSelector
-                      assets={data.assetLits}
-                      assetIndex={index}
-                      name={`asset_${index}`}
-                    />
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label
-                      htmlFor="last-name"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Allocazione
-                    </label>
-                    <div className="mt-1">
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <div className="flex max-w-lg rounded-md shadow-sm">
-                          <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500 sm:text-sm">
-                            %
-                          </span>
-                          <input
-                            onChange={valuesHandler}
-                            type="number"
-                            min={1}
-                            max={100}
-                            name={`allocation_${index}`}
-                            id={`allocation_${index}`}
-                            className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {index === 0 ? null : (
-                    <div className="mt-6">
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <button
-                          onClick={() => {
-                            const currentAllocation = `allocation_${index}`;
-                            console.log("currentAllocation", currentAllocation);
-                            setValues((current) => {
-                              const copy = { ...current };
-
-                              // 👇️ remove salary key from object
-                              delete copy[currentAllocation];
-                              calcTotal(copy);
-
-                              return copy;
-                            });
-                            setAssets(assets - 1);
-                          }}
-                          type="button"
-                          className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-red-500 hover:bg-gray-50 focus:z-10 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-                        >
-                          <span className="sr-only">Delete</span>
-                          <XCircleIcon className="h-5 w-5" aria-hidden="true" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
+          {allocations.map((allocation, index) => (
+            <React.Fragment key={allocation.id}>
+              <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                <div className="sm:col-span-3">
+                  <DropdownSelector
+                    assets={data.assetLits}
+                    assetIndex={index}
+                    name={`asset_${index}`}
+                  />
                 </div>
-              </React.Fragment>
-            );
-          })}
+
+                <div className="sm:col-span-2">
+                  <label
+                    htmlFor="last-name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Allocazione
+                  </label>
+                  <div className="mt-1">
+                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                      <div className="flex max-w-lg rounded-md shadow-sm">
+                        <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500 sm:text-sm">
+                          %
+                        </span>
+                        <input
+                          onChange={updateAllocation}
+                          type="number"
+                          min={1}
+                          max={100}
+                          name={`allocation_${index}`}
+                          id={`allocation_${index}`}
+                          className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {index === 0 ? null : (
+                  <div className="mt-6">
+                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                      <button
+                        onClick={() => removeAllocation(allocation.id)}
+                        type="button"
+                        className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-red-500 hover:bg-gray-50 focus:z-10 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                      >
+                        <span className="sr-only">Delete</span>
+                        <XCircleIcon className="h-5 w-5" aria-hidden="true" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </React.Fragment>
+          ))}
+
+          {allocations.length < 10 ? (
+            <button
+              type="button"
+              onClick={() => {
+                addAllocation(`allocation_${allocations.length}`);
+              }}
+              className="inline-flex items-center rounded-full border border-transparent bg-teal-600 p-1 text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+            >
+              <PlusIcon className="h-5 w-5" aria-hidden="true" />
+            </button>
+          ) : null}
         </div>
-        {assets < 10 ? (
-          <button
-            type="button"
-            onClick={() => setAssets(assets + 1)}
-            className="inline-flex items-center rounded-full border border-transparent bg-teal-600 p-1 text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-          >
-            <PlusIcon className="h-5 w-5" aria-hidden="true" />
-          </button>
-        ) : null}
       </div>
 
       <div className="pt-5">
