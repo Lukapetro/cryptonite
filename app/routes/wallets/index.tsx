@@ -11,6 +11,7 @@ import NoWalletFound from "~/components/wallets/nowalletfound";
 import { getWalletListItems } from "~/models/wallet.server";
 import { requireUserId } from "~/session.server";
 import dayjs from "dayjs";
+import { Badge } from "~/components/badge";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await requireUserId(request);

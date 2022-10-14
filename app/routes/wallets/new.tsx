@@ -24,7 +24,6 @@ export async function action({ request }: ActionArgs) {
   const values = Object.fromEntries(formData);
 
   const { title, description, ...assetsWithAllocation } = values;
-  console.log("assetsWithAllocation", assetsWithAllocation);
 
   const assets: IAssetWithAllocation[] = [];
 
@@ -82,8 +81,6 @@ export default function NewWalletPage() {
     const { name } = e.target;
     const { value } = e.target;
 
-    console.log("name", name);
-
     const parsedValue = value === "" ? 0 : Number(value);
 
     setAllocations((current) =>
@@ -103,8 +100,6 @@ export default function NewWalletPage() {
       })
     );
   };
-
-  console.log("allocations", allocations);
 
   return (
     <Form method="post" className="space-y-8 divide-y divide-gray-200">
@@ -194,7 +189,7 @@ export default function NewWalletPage() {
                   <DropdownSelector
                     assets={data.assetLits}
                     assetIndex={index}
-                    name={`asset_${index}`}
+                    name={`asset${allocation.id}`}
                   />
                 </div>
 
@@ -216,8 +211,8 @@ export default function NewWalletPage() {
                           type="number"
                           min={1}
                           max={100}
-                          name={`allocation_${index}`}
-                          id={`allocation_${index}`}
+                          name={`${allocation.id}`}
+                          id={`${allocation.id}`}
                           className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                         />
                       </div>
