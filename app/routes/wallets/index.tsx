@@ -1,17 +1,13 @@
-import {
-  CheckCircleIcon,
-  ChevronRightIcon,
-  DocumentTextIcon,
-} from "@heroicons/react/20/solid";
+import { ChevronRightIcon, DocumentTextIcon } from "@heroicons/react/20/solid";
 import { WalletIcon } from "@heroicons/react/24/outline";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import dayjs from "dayjs";
+import { Badge } from "~/components/badge";
 import NoWalletFound from "~/components/wallets/nowalletfound";
 import { getWalletListItems } from "~/models/wallet.server";
 import { requireUserId } from "~/session.server";
-import dayjs from "dayjs";
-import { Badge } from "~/components/badge";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await requireUserId(request);
@@ -21,6 +17,20 @@ export async function loader({ request }: LoaderArgs) {
 
 export default function WalletIndexPage() {
   const data = useLoaderData<typeof loader>();
+
+  function getWalletStatusAndText(status: string) {
+    switch (status) {
+      case "Completed":
+        return { color: Badge.variant.GREEN, text: "Completato" };
+      case "Empty":
+        return { color: Badge.variant.RED, text: "Vuoto" };
+      case "Partial":
+        return { color: Badge.variant.YELLOW, text: "Parziale" };
+
+      default:
+        return { color: Badge.variant.RED, text: "Completato" };
+    }
+  }
 
   return (
     <>
@@ -62,13 +72,15 @@ export default function WalletIndexPage() {
                               </time>
                             </p>
 
-                            <p className="mt-2 flex items-center text-sm text-gray-500">
-                              <CheckCircleIcon
-                                className="mr-1.5 h-5 w-5 flex-shrink-0 text-red-400"
-                                aria-hidden="true"
-                              />
-                              {wallet.status}
-                            </p>
+                            <div className="mt-2 flex">
+                              <Badge
+                                variant={
+                                  getWalletStatusAndText(wallet.status).color
+                                }
+                              >
+                                {getWalletStatusAndText(wallet.status).text}
+                              </Badge>
+                            </div>
                           </div>
                         </div>
                       </div>

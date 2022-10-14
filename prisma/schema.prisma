@@ -17,16 +17,11 @@ model User {
   wallets  Wallet[]
 }
 
-// enum WalletStatus {
-//   Completed
-//   Partial
-//   Empty
-// }
 model Wallet {
   id    String @id @default(cuid())
   title String
   description  String?
-  status  String    @default("Empty")
+  status  String    @default("empty")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

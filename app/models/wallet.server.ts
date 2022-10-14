@@ -1,4 +1,4 @@
-import type { AssetsOnWallets, User, Wallet } from "@prisma/client";
+import type { User, Wallet } from "@prisma/client";
 
 import { prisma } from "~/db.server";
 
@@ -9,19 +9,19 @@ export interface IAssetWithAllocation {
   percentage: number;
 }
 
-export default function calculateStatus({
-  percentage,
-}: {
-  percentage: AssetsOnWallets["percentage"];
-}) {
-  switch (percentage) {
+export default function calculateStatus(assets: IAssetWithAllocation[]) {
+  const totalAllocation = assets.reduce((accumulator, asset) => {
+    return accumulator + asset.percentage;
+  }, 0);
+
+  switch (totalAllocation) {
     case 0:
-      return "vuoto";
+      return "Empty";
     case 100:
-      return "completo";
+      return "Completed";
 
     default:
-      return "parziale";
+      return "Partial";
   }
 }
 
@@ -83,7 +83,7 @@ export function createWallet({
     data: {
       title,
       description,
-      status: "completo",
+      status: calculateStatus(assets),
 
       assets: {
         create: assets.map((asset) => ({
