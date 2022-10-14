@@ -15,6 +15,7 @@ import { getWalletListItems } from "~/models/wallet.server";
 import { requireUserId } from "~/session.server";
 import { useUser } from "~/utils";
 import CryptoniteTextLogo from "../images/logos/cryptonite-text-black.svg";
+import CryptoniteLogo from "../images/logos/cryptonite-white.svg";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await requireUserId(request);
@@ -132,7 +133,7 @@ export default function WalletsPage() {
                       <div>
                         <img
                           className="inline-block h-10 w-10 rounded-full"
-                          src="https://www.lukapetrovic.dev/_next/image?url=%2Favatar.png&w=256&q=75"
+                          src={CryptoniteLogo}
                           alt=""
                         />
                       </div>
@@ -203,7 +204,7 @@ export default function WalletsPage() {
                 <div>
                   <img
                     className="inline-block h-9 w-9 rounded-full"
-                    src="https://www.lukapetrovic.dev/_next/image?url=%2Favatar.png&w=256&q=75"
+                    src={CryptoniteLogo}
                     alt=""
                   />
                 </div>

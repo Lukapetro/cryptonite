@@ -7,7 +7,8 @@ import * as React from "react";
 import Alert from "~/components/alert";
 import DropdownSelector from "~/components/dropdownselector";
 import { getAllAsset } from "~/models/asset.server";
-import { createWallet, IAssetWithAllocation } from "~/models/wallet.server";
+import type { IAssetWithAllocation } from "~/models/wallet.server";
+import { createWallet } from "~/models/wallet.server";
 
 import { requireUserId } from "~/session.server";
 
@@ -262,7 +263,7 @@ export default function NewWalletPage() {
           </Link>
           <button
             type="submit"
-            disabled={totalAllocation > 100}
+            disabled={totalAllocation !== 100}
             className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-teal-500 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 disabled:opacity-50"
           >
             Crea
